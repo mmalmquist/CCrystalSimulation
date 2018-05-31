@@ -1,7 +1,16 @@
 # CCrystalSimulation
-My C (with GTK+) implementation of a crystal simulation
+My C (with GTK+) implementation of a crystal simulation.<br>
+Requires GTK+ 3.<br>
 
-Requires GTK+ 3
+## Build
+any of
++ `make debug`
++ `make release`
+<br>
 
-build: `make release`
-run: `./build/CCrystalSimulation mode=gui size=400`
+## Run
+- Supports GUI and CLI mode.
+- Supports different sizes
+<br>
+`./build/CCrystalSimulation mode=[mode] size=[size]`
+<br>
