@@ -4,13 +4,13 @@ Requires GTK+ 3.<br>
 
 ## Build
 any of
-+ `make debug`
-+ `make release`
++ <code>$ make debug</code>
++ <code>$ make release</code>
 <br>
 
 ## Run
 - Supports GUI and CLI mode.
 - Supports different sizes
 <br>
-`./build/CCrystalSimulation mode=[mode] size=[size]`
+<code>$ ./build/CCrystalSimulation mode=[mode] size=[size]</code>
 <br>
