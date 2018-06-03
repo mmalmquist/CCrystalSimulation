@@ -1,7 +1,7 @@
 #include "CrystalModel.h"
 
 #include <stdlib.h>
-#include <strings.h>
+#include <string.h>
 #include <stdbool.h>
 #include <math.h>
 
@@ -183,7 +183,7 @@ CrystalModel_to_string(CrystalModel const *self)
   int x = CrystalModel_get_x(self);
   int y = CrystalModel_get_y(self);
   int size = CrystalModel_get_radius(self);
-  bzero(self->m_s->str, self->m_s->len);
+  memset(self->m_s->str, 0, self->m_s->len);
   char *s;
   char const *out = s = self->m_s->str;
   for(int i = -(size+1); i < size+1; i++) {

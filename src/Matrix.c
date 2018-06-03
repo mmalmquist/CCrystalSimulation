@@ -26,5 +26,5 @@ Matrix_destroy(Matrix *self)
 void
 Matrix_clear(Matrix *self)
 {
-  bzero(self->m_array, self->m_size*self->m_size);
+  memset(self->m_array, 0, self->m_size*self->m_size);
 }
