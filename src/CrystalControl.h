@@ -7,12 +7,12 @@
 
 typedef struct crystal_control_t CrystalControl;
 
-CrystalControl *
+extern CrystalControl *
 CrystalControl_create(CrystalModel *cm,
 		      CrystalView *cv);
-void
+extern void
 CrystalControl_destroy(CrystalControl *self);
-void
+extern void
 CrystalControl_init_ui(CrystalControl *self,
 		       GtkBuilder *builder);
 

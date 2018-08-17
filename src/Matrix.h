@@ -1,33 +1,42 @@
 #ifndef MATRIX_H_
 #define MATRIX_H_
 
-#include <stdbool.h>
+typedef unsigned char matrix_t;
 
-typedef struct matrix_t
-{
-  bool *m_array;
-  int m_size;
+typedef struct {
+  matrix_t *_array;
+  unsigned _size;
 } Matrix;
 
-Matrix *
-Matrix_create(int size);
+extern Matrix *
+Matrix_create(unsigned size);
 
-void
+extern void
 Matrix_destroy(Matrix *self);
 
-void
+extern void
 Matrix_clear(Matrix *self);
 
-static inline bool *
-Matrix_at(Matrix *self, int x, int y)
+static inline unsigned
+Matrix_size(Matrix *self)
 {
-  return self->m_array + (x + y*self->m_size);
+  return self->_size;
 }
 
-static inline bool const *
-Matrix_at_const(Matrix const *self, int x, int y)
+static inline matrix_t *
+Matrix_at(Matrix *self,
+	  unsigned x,
+	  unsigned y)
 {
-  return self->m_array + (x + y*self->m_size);
+  return self->_array + (x + y*self->_size);
 }
 
-#endif // MATRIX_H_
+static inline matrix_t const *
+Matrix_at_const(Matrix const *self,
+		unsigned x,
+		unsigned y)
+{
+  return self->_array + (x + y*self->_size);
+}
+
+#endif /* MATRIX_H_ */

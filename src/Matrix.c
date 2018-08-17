@@ -3,28 +3,28 @@
 #include <stdlib.h>
 #include <string.h>
 
-Matrix *
-Matrix_create(int size)
+extern Matrix *
+Matrix_create(unsigned size)
 {
   Matrix *self = (Matrix *)calloc(1, sizeof(Matrix));
   
-  self->m_array = (bool *)calloc(size*size, sizeof(bool));
-  self->m_size = size;
+  self->_array = (matrix_t *)calloc(size*size, sizeof(matrix_t));
+  self->_size = size;
   
   return self;
 }
 
-void
+extern void
 Matrix_destroy(Matrix *self)
 {
   if (!self) { return; }
 
-  free(self->m_array);
+  free(self->_array); self->_array = NULL;
   free(self);
 }
 
-void
+extern void
 Matrix_clear(Matrix *self)
 {
-  memset(self->m_array, 0, self->m_size*self->m_size);
+  memset(self->_array, 0, self->_size*self->_size);
 }

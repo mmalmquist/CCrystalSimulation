@@ -4,11 +4,11 @@ PROJECT( CCrystalSimulation )
 
 SET( CMAKE_VERBOSE_MAKEFILE ON )
 SET( CMAKE_C_COMPILER "gcc" )
-ADD_DEFINITIONS( -std=gnu99 )
+ADD_DEFINITIONS( -std=gnu99 -Wall -Wextra -Wpedantic )
 
 if ( CMAKE_BUILD_TYPE STREQUAL "Release" )
   ADD_DEFINITIONS(
-    -O2
+    -O3
     -mtune=native
     -march=native
     )
@@ -17,8 +17,7 @@ if ( CMAKE_BUILD_TYPE STREQUAL "Debug" )
   ADD_DEFINITIONS(
     -Og
     -ggdb
-    -Wall
-    -Wextra
+    -Werror
     )
 endif ( CMAKE_BUILD_TYPE STREQUAL "Debug" )
 

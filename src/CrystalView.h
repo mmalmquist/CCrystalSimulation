@@ -4,17 +4,15 @@
 #include <gtk/gtk.h>
 #include "CrystalModel.h"
 
-#define WEAK_REF
-
 typedef struct crystal_view_t CrystalView;
 
-CrystalView *
-CrystalView_create(WEAK_REF CrystalModel *weak_cm);
-void
+extern CrystalView *
+CrystalView_create(CrystalModel *cm);
+extern void
 CrystalView_destroy(CrystalView *self);
-void
+extern void
 CrystalView_repaint(CrystalView *self);
-void
+extern void
 CrystalView_set_gtk_widget(CrystalView *self,
 			   GtkWidget *widget);
 

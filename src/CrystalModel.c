@@ -2,105 +2,78 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
 #include <math.h>
 
 #include "Matrix.h"
 #include "Point.h"
 #include "random.h"
 
-typedef struct string_t
-{
-  char *str;
-  int len;
-} String;
-
-String *
-String_alloc(int size)
-{
-  String *self = calloc(1, sizeof(String));
-  self->str = calloc(size+1, sizeof(char));
-  self->len = size;
-  return self;
-}
-
-void
-String_dealloc(String *self)
-{
-  if (!self) { return; }
-
-  free(self->str);
-  free(self);
-}
-
 struct crystal_model_t
 {
-  Matrix *m_mat;
-  Point m_p;
-  int m_r_start;
-  int m_r_escape;
-  int m_bath_width;
-  String *m_s;
+  Matrix *_mat;
+  Point _p;
+  unsigned _r_start;
+  unsigned _r_escape;
+  char *_s;
 };
 
-static bool
-outside_circle(int rEscape,
+static int
+outside_circle(unsigned rEscape,
 	       Point const *p);
-static bool
-any_neighbours(CrystalModel const *self,
-	       Point const *p);
+static int
+any_neighbours(CrystalModel const * self,
+	       Point const * p);
 static void
-drop_new_ion(int r_start,
+drop_new_ion(unsigned r_start,
 	     Point *p);
 static void
 step_once(Point *p);
-static bool *
+static matrix_t *
 bath_at(CrystalModel const *self,
 	int x,
 	int y);
 
-static int const dx[] = { 1, -1, 0,  0};
-static int const dy[] = { 0,  0, 1, -1};
+static Point const dp[] = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} };
 
-CrystalModel *
-CrystalModel_create(int bath_width, int r_start, int r_escape)
+extern CrystalModel *
+CrystalModel_create(Matrix *mat,
+		    unsigned r_start,
+		    unsigned r_escape)
 {
   CrystalModel *self = (CrystalModel *)calloc(1, sizeof(CrystalModel));
   
-  self->m_r_start = r_start;
-  self->m_r_escape = r_escape;
-  self->m_bath_width = bath_width;
-  self->m_mat = Matrix_create(bath_width);
-  self->m_s = String_alloc((bath_width+2)*(bath_width+2) + 1);
+  self->_r_start = r_start;
+  self->_r_escape = r_escape;
+  self->_mat = mat;
+  self->_s = (char *) calloc((Matrix_size(mat)+2)*(Matrix_size(mat)+2) + 1, sizeof(char));
 
   CrystalModel_reset(self);
   return self;
 }
 
-void
+extern void
 CrystalModel_destroy(CrystalModel *self)
 {
   if (!self) { return; }
 
-  String_dealloc(self->m_s);
-  Matrix_destroy(self->m_mat);
+  free(self->_s); self->_s = NULL;
   free(self);
 }
 
-bool
+extern int
 CrystalModel_crystallize_one_ion(CrystalModel *self) {
   Point p = { 0, 0 };
-  for (drop_new_ion(self->m_r_start, &p); !any_neighbours(self, &p); step_once(&p)) {
-    if (outside_circle(self->m_r_escape, &p)) {
-      return CrystalModel_crystallize_one_ion(self);
+  for (drop_new_ion(self->_r_start, &p); !any_neighbours(self, &p); step_once(&p)) {
+    if (outside_circle(self->_r_escape, &p)) {
+      drop_new_ion(self->_r_start, &p);
     }
   }
-  self->m_p = p;
-  *bath_at(self, p.x, p.y) = true;
-  return !outside_circle(self->m_r_start, &self->m_p);
+  self->_p = p;
+  *bath_at(self, p.x, p.y) = 1;
+  return !outside_circle(self->_r_start, &self->_p);
 }
 
-bool
+extern int
 CrystalModel_get_model_value(CrystalModel const *self,
 			     int x,
 			     int y)
@@ -108,91 +81,91 @@ CrystalModel_get_model_value(CrystalModel const *self,
   return *bath_at(self, x, y);
 }
 
-void
+extern void
 CrystalModel_reset(CrystalModel *self)
 {
-  Matrix_clear(self->m_mat);
-  *bath_at(self, 0, 0) = true;
+  Matrix_clear(self->_mat);
+  *bath_at(self, 0, 0) = 1;
 }
 
-int
+extern unsigned
 CrystalModel_x_bath_to_model_rep(CrystalModel const *self,
 				 int x)
 {
-  return x + self->m_bath_width/2;
+  return x + Matrix_size(self->_mat)/2;
 }
 
-int
+extern unsigned
 CrystalModel_y_bath_to_model_rep(CrystalModel const *self,
 				 int y)
 {
-  return self->m_bath_width/2 - y;
+  return Matrix_size(self->_mat)/2 - y;
 }
 
-int
+extern int
 CrystalModel_get_x(CrystalModel const *self)
 {
-  return self->m_p.x;
+  return self->_p.x;
 }
 
-int
+extern int
 CrystalModel_get_y(CrystalModel const *self)
 {
-  return self->m_p.y;
+  return self->_p.y;
 }
 
-int
+extern unsigned
 CrystalModel_get_r_bounds(CrystalModel const *self)
 {
-  return self->m_r_start;
+  return self->_r_start;
 }
 
-int
+extern unsigned
 CrystalModel_get_radius(CrystalModel const *self)
 {
-  return self->m_r_escape;
+  return self->_r_escape;
 }
 
-int
+extern unsigned
 CrystalModel_get_bath_width(CrystalModel const *self)
 {
-  return self->m_bath_width;
+  return Matrix_size(self->_mat);
 }
 
-bool
+extern int
 CrystalModel_run_some_steps(CrystalModel *self,
-			    int steps)
+			    unsigned steps)
 {
-  if (steps > 0) {
-    return CrystalModel_crystallize_one_ion(self) && CrystalModel_run_some_steps(self, steps-1);
+  while (steps-- > 0) {
+    if (!CrystalModel_crystallize_one_ion(self)) {
+      return 0;
+    }
   }
-  return true;
+  return 1;
 }
 
-void
+extern void
 CrystalModel_srand(CrystalModel *self,
-		   int seed)
+		   unsigned seed)
 {
   (void)self;
   cs_srand(seed);
 }
 
-char const *
+extern char const *
 CrystalModel_to_string(CrystalModel const *self)
 {
-  int x = CrystalModel_get_x(self);
-  int y = CrystalModel_get_y(self);
-  int size = CrystalModel_get_radius(self);
-  memset(self->m_s->str, 0, self->m_s->len);
-  char *s;
-  char const *out = s = self->m_s->str;
-  for(int i = -(size+1); i < size+1; i++) {
+  int i, j, x = CrystalModel_get_x(self), y = CrystalModel_get_y(self);
+  long size = CrystalModel_get_radius(self);
+  char *s = self->_s;
+  
+  for(i = -(size+1); i < size+1; i++) {
     *s++ = '-';
   }
   *s++ = '\n';
-  for(int i = -size; i < size; i++) {
+  for(i = -size; i < size; i++) {
     *s++ = '|';
-    for(int j = -size; j < size; j++) {
+    for(j = -size; j < size; j++) {
       if (CrystalModel_get_model_value(self, i, j)) {
 	*s++ = (i == x && j == y) ? '#' : '*';
       } else {
@@ -202,32 +175,32 @@ CrystalModel_to_string(CrystalModel const *self)
     *s++ = '|';
     *s++ = '\n';
   }
-  for(int i = -(size+1); i < size+1; i++) {
+  for(i = -(size+1); i < size+1; i++) {
     *s++ = '-';
   }
   *s++ = '\n';
-  return out;
+  return self->_s;
 }
 
-static bool
-outside_circle(int rEscape,
+static int
+outside_circle(unsigned rEscape,
 	       Point const *p)
 {
-  return (int)sqrt(p->x*p->x + p->y*p->y) >= rEscape;
+  return (unsigned)sqrt(p->x*p->x + p->y*p->y) >= rEscape;
 }
 
-static bool
-any_neighbours(CrystalModel const *self,
-	       Point const *p)
+static int
+any_neighbours(CrystalModel const * self,
+	       Point const * p)
 {
-  return CrystalModel_get_model_value(self, p->x+1, p->y)
-    || CrystalModel_get_model_value(self, p->x-1, p->y)
-    || CrystalModel_get_model_value(self, p->x, p->y+1)
-    || CrystalModel_get_model_value(self, p->x, p->y-1);
+  return (CrystalModel_get_model_value(self, p->x+dp[0].x, p->y+dp[0].y) ||
+	  CrystalModel_get_model_value(self, p->x+dp[1].x, p->y+dp[1].y) ||
+	  CrystalModel_get_model_value(self, p->x+dp[2].x, p->y+dp[2].y) ||
+	  CrystalModel_get_model_value(self, p->x+dp[3].x, p->y+dp[3].y));
 }
 
 static void
-drop_new_ion(int r_start,
+drop_new_ion(unsigned r_start,
 	     Point *p)
 {
   double alpha = 2 * M_PI * cs_drand();
@@ -238,17 +211,17 @@ drop_new_ion(int r_start,
 static void
 step_once(Point *p)
 {
-  int i = cs_rand() & 3;
-  p->x += dx[i];
-  p->y += dy[i];
+  Point const *d = &dp[cs_rand() & 3];
+  p->x += d->x;
+  p->y += d->y;
 }
 
-static bool *
+static matrix_t *
 bath_at(CrystalModel const *self,
 	int x,
 	int y)
 {
-  return Matrix_at(self->m_mat,
+  return Matrix_at(self->_mat,
 		   CrystalModel_x_bath_to_model_rep(self, x),
 		   CrystalModel_y_bath_to_model_rep(self, y));
 }
