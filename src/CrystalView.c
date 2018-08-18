@@ -101,8 +101,9 @@ draw_edge(CrystalView *self)
 static void
 draw_crystal(CrystalView *self)
 {
-  int i, j, x_l = CrystalModel_get_x(self->_cm), y_l = CrystalModel_get_y(self->_cm);
-  long r = CrystalModel_get_radius(self->_cm);
+  int i, j;
+  int const x_l = CrystalModel_get_x(self->_cm), y_l = CrystalModel_get_y(self->_cm);
+  long const r = CrystalModel_get_radius(self->_cm);
   
   cairo_set_line_width(self->_cr, 0);
   

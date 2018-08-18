@@ -155,8 +155,9 @@ CrystalModel_srand(CrystalModel *self,
 extern char const *
 CrystalModel_to_string(CrystalModel const *self)
 {
-  int i, j, x = CrystalModel_get_x(self), y = CrystalModel_get_y(self);
-  long size = CrystalModel_get_radius(self);
+  int i, j;
+  int const x = CrystalModel_get_x(self), y = CrystalModel_get_y(self);
+  long const size = CrystalModel_get_radius(self);
   char *s = self->_s;
   
   for(i = -(size+1); i < size+1; i++) {
@@ -190,8 +191,8 @@ outside_circle(unsigned rEscape,
 }
 
 static int
-any_neighbours(CrystalModel const * self,
-	       Point const * p)
+any_neighbours(CrystalModel const *self,
+	       Point const *p)
 {
   return (CrystalModel_get_model_value(self, p->x+dp[0].x, p->y+dp[0].y) ||
 	  CrystalModel_get_model_value(self, p->x+dp[1].x, p->y+dp[1].y) ||
