@@ -157,12 +157,11 @@ run_some_steps(gpointer data)
 
 static gboolean
 change_speed_event_cb(GtkWidget *widget,
-		      GdkEventMotion *event,
 		      gpointer data)
 {
   CrystalControl *self;
   unsigned modifier;
-  (void)widget;(void)event;
+  (void)widget;
   
   if (!data) {
     return FALSE;
@@ -180,11 +179,10 @@ change_speed_event_cb(GtkWidget *widget,
 
 static gboolean
 start_event_cb(GtkWidget *widget,
-	       GdkEventMotion *event,
 	       gpointer data)
 {
   CrystalControl *self;
-  (void)widget;(void)event;
+  (void)widget;
   
   if (!data) {
     return FALSE;
@@ -208,10 +206,9 @@ start_event_cb(GtkWidget *widget,
 
 static gboolean
 stop_event_cb(GtkWidget *widget,
-	      GdkEventMotion *event,
 	      gpointer data)
 {
-  (void)widget;(void)event;
+  (void)widget;
   if (!data) { return FALSE; }
   
   signal_stop_simulation((CrystalControl *)data);
